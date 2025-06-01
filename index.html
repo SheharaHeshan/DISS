@@ -47,8 +47,41 @@
             transform: translateY(-2px);
         }
 
-        .reveal-btn:active {
-            transform: translateY(0);
+        .name-input-container {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+            align-items: center;
+        }
+
+        .name-input {
+            background: rgba(0, 0, 0, 0.8);
+            border: 2px solid #00ff00;
+            color: #00ff00;
+            padding: 15px 25px;
+            font-size: 18px;
+            border-radius: 25px;
+            outline: none;
+            text-align: center;
+            min-width: 250px;
+            box-shadow: 0 0 15px rgba(0, 255, 0, 0.3);
+            transition: all 0.3s ease;
+        }
+
+        .name-input:focus {
+            border-color: #00ff00;
+            box-shadow: 0 0 25px rgba(0, 255, 0, 0.6);
+            transform: scale(1.05);
+        }
+
+        .name-input::placeholder {
+            color: rgba(0, 255, 0, 0.6);
+        }
+
+        .name-input-container.hidden {
+            opacity: 0;
+            scale: 0;
+            transition: all 0.5s ease;
         }
 
         .hidden-text {
@@ -175,12 +208,17 @@
     <div class="particles" id="particles"></div>
     
     <div class="container">
-        <button class="reveal-btn" id="revealBtn">Click Me</button>
-        <div class="hidden-text" id="hiddenText">Fuck You Chanuka....!</div>
+        <div class="name-input-container" id="nameContainer">
+            <input type="text" id="nameInput" class="name-input" placeholder="Enter your name..." maxlength="20">
+            <button class="reveal-btn" id="submitBtn">Submit</button>
+        </div>
+        <div class="hidden-text" id="hiddenText"></div>
     </div>
 
     <script>
-        const revealBtn = document.getElementById('revealBtn');
+        const submitBtn = document.getElementById('submitBtn');
+        const nameInput = document.getElementById('nameInput');
+        const nameContainer = document.getElementById('nameContainer');
         const hiddenText = document.getElementById('hiddenText');
         const particles = document.getElementById('particles');
 
@@ -208,12 +246,26 @@
             setInterval(createParticle, 200);
         }
 
-        // Button click event
-        revealBtn.addEventListener('click', function() {
-            // Hide button with animation
-            revealBtn.classList.add('hidden');
+        // Submit button click event
+        function handleSubmit() {
+            const userName = nameInput.value.trim();
             
-            // Show text after button disappears
+            if (userName === '') {
+                // Shake input if empty
+                nameInput.style.animation = 'shake 0.5s ease-in-out';
+                setTimeout(() => {
+                    nameInput.style.animation = '';
+                }, 500);
+                return;
+            }
+            
+            // Set personalized message
+            hiddenText.textContent = `Fuck You ${userName}....!`;
+            
+            // Hide name container with animation
+            nameContainer.classList.add('hidden');
+            
+            // Show text after container disappears
             setTimeout(() => {
                 hiddenText.classList.add('show');
                 startParticles();
@@ -222,7 +274,17 @@
                 setTimeout(() => {
                     hiddenText.classList.add('shake');
                 }, 300);
-            }, 300);
+            }, 500);
+        }
+
+        // Button click event
+        submitBtn.addEventListener('click', handleSubmit);
+
+        // Enter key event
+        nameInput.addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') {
+                handleSubmit();
+            }
         });
 
         // Add click-to-reset functionality on text
@@ -230,9 +292,11 @@
             if (hiddenText.classList.contains('show')) {
                 hiddenText.classList.remove('show', 'shake');
                 particles.classList.remove('active');
+                nameInput.value = '';
                 
                 setTimeout(() => {
-                    revealBtn.classList.remove('hidden');
+                    nameContainer.classList.remove('hidden');
+                    nameInput.focus();
                 }, 300);
             }
         });
@@ -241,6 +305,9 @@
         document.addEventListener('DOMContentLoaded', function() {
             // Add a subtle glow effect to the body
             document.body.style.background = 'radial-gradient(ellipse at center, #111 0%, #000 100%)';
+            
+            // Focus on name input when page loads
+            nameInput.focus();
         });
     </script>
 </body>
